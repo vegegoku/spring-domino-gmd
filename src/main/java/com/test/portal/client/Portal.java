@@ -34,8 +34,8 @@ public class Portal implements EntryPoint {
         }
 
         RequestBuilder sendRequest = new RequestBuilder(RequestBuilder.POST, url);
-        sendRequest.setHeader( "Content-type", "text/plain" );
-        sendRequest.setHeader( "accept", "text/plain" );
+        sendRequest.setHeader("Content-type", "text/plain");
+        sendRequest.setHeader("accept", "text/plain");
         try {
           sendRequest.sendRequest("Hello, World!", new RequestCallback() {
             @Override

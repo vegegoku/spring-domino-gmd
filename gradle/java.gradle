@@ -1,0 +1,32 @@
+group 'com.test.portal'
+version '1.0-SNAPSHOT'
+
+compileJava {
+  sourceCompatibility = "1.8"
+  targetCompatibility = "1.8"
+  options.encoding = 'UTF-8'
+}
+
+// Just a smoke test that using this option does not lead to any exception
+compileJava.options.compilerArgs = ['-Xlint:unchecked']
+
+test {
+  systemProperties = System.properties
+}
+
+compileJava.dependsOn(processResources)
+
+jar.dependsOn compileGwt
+
+jar {
+  into("static") {
+    from compileGwt.buildDir
+  }
+}
+
+sourceSets {
+  main.java.srcDir "src/main/java"
+  main.resources.srcDir "src/main/resources"
+  test.java.srcDir "src/test/java"
+  test.resources.srcDir "src/test/resources"
+}
