@@ -1,0 +1,14 @@
+ext {
+  junitVersion = "4.12"
+
+  log4jVersion = "2.8.2"
+
+  lombokVersion = "1.16.20"
+  wsrsapiVersion = "2.1"
+
+  gwtVersion = "2.8.2"
+  gwtMaterialVersion = "2.0.1"
+  gwtMaterialAddinsVersion = "2.0.1"
+  gwtMaterialThemesVersion = "2.0.1"
+  gwtMaterialTableVersion = "2.0.1"
+}

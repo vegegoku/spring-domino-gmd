@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration monitorInterval="30" status="debug">
+  <!-- monitorInterval: automatic reload every 30sec on changes -->
+  <!-- status: log4j2 internal logging (not for the app) -->
+  <Properties>
+    <Property name="log-path">logs/</Property>
+    <Property name="log-project-name">Portal</Property>
+    <Property name="log-pattern">[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n</Property>
+    <Property name="rollover-strategy-max">10</Property>
+    <Property name="rolling-size-based">5 MB</Property>
+  </Properties>
+
+  <Appenders>
+    <!-- the standard-console-appender -->
+    <Console name="CONSOLE" target="SYSTEM_OUT">
+      <PatternLayout pattern="${log-pattern}"/>
+    </Console>
+
+    <File name="ALL" fileName="${log-path}/${log-project-name}-all.log" append="true" additivity="false"
+      immediateFlush="true">
+      <PatternLayout pattern="${log-pattern}"/>
+      <Policies>
+        <SizeBasedTriggeringPolicy size="${rolling-size-based}"/>
+      </Policies>
+      <DefaultRolloverStrategy max="${rollover-strategy-max}"/>
+    </File>
+    <File name="ERROR" fileName="${log-path}/${log-project-name}-error.log" append="true" additivity="false"
+      immediateFlush="true">
+      <PatternLayout pattern="%${log-pattern}"/>
+      <Policies>
+        <SizeBasedTriggeringPolicy size="${rolling-size-based}"/>
+      </Policies>
+      <DefaultRolloverStrategy max="${rollover-strategy-max}"/>
+    </File>
+  </Appenders>
+
+
+  <Loggers>
+    <!-- Every configuration must have a root logger. If one is not configured the default root LoggerConfig is ERROR with Console appender attached. -->
+    <Root level="DEBUG">
+      <AppenderRef ref="CONSOLE"/>
+    </Root>
+
+    <!-- server1-loggers -->
+    <!-- additivity means, that parent-logger (in every case the root-logger) will also get the chance to log this stuff -->
+    <Logger name="com.test.portal.server" additivity="TRUE" level="ALL">
+      <AppenderRef ref="ALL" level="ALL"/>
+      <AppenderRef ref="ERROR" level="ERROR"/>
+    </Logger>
+  </Loggers>
+</Configuration>

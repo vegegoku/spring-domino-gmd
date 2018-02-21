@@ -1,0 +1,161 @@
+plugins {
+  id "java"
+  id "eclipse"
+  id "idea"
+  id "org.springframework.boot" version "1.5.9.RELEASE"
+  id "com.github.ben-manes.versions" version "0.17.0"
+  id "net.ltgt.apt" version "0.13"
+}
+
+repositories {
+  mavenCentral()
+  mavenLocal()
+  jcenter()
+}
+
+def rootDir = buildscript.sourceFile.parentFile
+def configDir = new File(rootDir, 'config')
+def checkstyleConfigDir = "$configDir/checkstyle"
+
+apply from: "$rootDir/gradle/versions.gradle"
+apply from: "$rootDir/gradle/codeQuality.gradle"
+
+group 'com.test.portal'
+version '1.0-SNAPSHOT'
+
+compileJava {
+  sourceCompatibility = "1.8"
+  targetCompatibility = "1.8"
+  options.encoding = 'UTF-8'
+}
+
+// Just a smoke test that using this option does not lead to any exception
+compileJava.options.compilerArgs = ['-Xlint:unchecked']
+
+test {
+  systemProperties = System.properties
+}
+
+sourceSets {
+  main.java.srcDir "src/main/java"
+  main.resources.srcDir "src/main/resources"
+  test.java.srcDir "src/test/java"
+  test.resources.srcDir "src/test/resources"
+}
+
+dependencies {
+  // logger
+  compile("org.apache.logging.log4j:log4j-core:$log4jVersion")
+  compile("org.apache.logging.log4j:log4j-api:$log4jVersion")
+
+  // gwt-material
+  compileOnly("com.github.gwtmaterialdesign:gwt-material:$gwtMaterialVersion")
+  compileOnly("com.github.gwtmaterialdesign:gwt-material-addins:$gwtMaterialAddinsVersion")
+  compileOnly("com.github.gwtmaterialdesign:gwt-material-themes:$gwtMaterialThemesVersion")
+  compileOnly("com.github.gwtmaterialdesign:gwt-material-table:$gwtMaterialTableVersion")
+
+  // GWT framework
+  compileOnly("com.google.gwt:gwt-user:$gwtVersion")
+  compileOnly("com.google.gwt:gwt-dev:$gwtVersion")
+
+  // spring
+  compileOnly("org.springframework.boot:spring-boot-configuration-processor")
+  compile("org.springframework.boot:spring-boot-starter-jetty")
+  compile("org.springframework.boot:spring-boot-starter-web") {
+    exclude module: "spring-boot-starter-tomcat"
+  }
+  compile("javax.ws.rs:javax.ws.rs-api:$wsrsapiVersion")
+
+  compileOnly("org.projectlombok:lombok:$lombokVersion")
+  apt("org.projectlombok:lombok:$lombokVersion")
+
+  // common testing
+  testCompile("junit:junit:$junitVersion")
+  testCompile("org.springframework.boot:spring-boot-starter-test")
+}
+
+clean.doFirst {
+  delete "${rootDir}/build"
+  delete "${rootDir}/war"
+}
+
+task wrapper(type: Wrapper) {
+  gradleVersion = "4.5.1"
+}
+
+task compileGwt(dependsOn: classes, type: JavaExec) {
+  ext.buildDir = "${project.buildDir}/gwt"
+  ext.extraDir = "${project.buildDir}/extra"
+
+  inputs.file sourceSets.main.java.srcDirs
+  inputs.dir sourceSets.main.output.resourcesDir
+  outputs.dir buildDir
+
+  doFirst {
+    file(buildDir).mkdirs()
+  }
+
+  main = "com.google.gwt.dev.Compiler"
+
+  classpath {
+    [
+        sourceSets.main.java.srcDirs,           // Java source
+        sourceSets.main.output.resourcesDir,    // Generated resources
+        sourceSets.main.output.classesDir,      // Generated classes
+        sourceSets.main.compileClasspath,       // Deps
+    ]
+  }
+
+  if (project.hasProperty('dev')) {
+    println "Run developer mode"
+    args = [
+        "com.test.portal.Portal",
+        "-war", buildDir,
+        "-logLevel", "INFO",
+        "-localWorkers", "4",
+        "-compileReport",
+        "-extra", extraDir,
+        "-style", "OBF",
+        "-optimize", "9" // 0=none, 9=max
+    ]
+  } else {
+    println "Run production mode"
+    args = [
+        "com.test.portal.Portal",
+        "-war", buildDir,
+        "-logLevel", "INFO",
+        "-localWorkers", "4",
+        "-compileReport",
+        "-extra", extraDir,
+        "-style", "OBF",
+        "-optimize", "9" // 0=none, 9=max
+    ]
+  }
+
+  maxHeapSize = "4G"
+}
+
+compileJava.dependsOn(processResources)
+
+jar.dependsOn compileGwt
+
+jar {
+  into("static") {
+    from compileGwt.buildDir
+  }
+}
+
+eclipse {
+  classpath {
+    containers.remove("org.eclipse.jdt.launching.JRE_CONTAINER")
+    containers "org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"
+  }
+}
+
+task fastRun {
+  gradle.startParameter.excludedTaskNames += "checkstyleMain"
+  gradle.startParameter.excludedTaskNames += "checkstyleTest"
+  gradle.startParameter.excludedTaskNames += "findbugsMain"
+  gradle.startParameter.excludedTaskNames += "findbugsTest"
+  gradle.startParameter.excludedTaskNames += "test"
+}
