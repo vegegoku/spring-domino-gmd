@@ -11,4 +11,5 @@ ext {
   gwtMaterialAddinsVersion = "2.0.1"
   gwtMaterialThemesVersion = "2.0.1"
   gwtMaterialTableVersion = "2.0.1"
+  dominoVersion = "1.0-rc.2"
 }

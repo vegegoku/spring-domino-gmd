@@ -31,6 +31,38 @@ dependencies {
   compileOnly("com.github.gwtmaterialdesign:gwt-material-themes:$gwtMaterialThemesVersion")
   compileOnly("com.github.gwtmaterialdesign:gwt-material-table:$gwtMaterialTableVersion")
 
+  compileOnly("com.progressoft.brix.domino.api:domino-api-shared:$dominoVersion")
+  compileOnly("com.progressoft.brix.domino.api:domino-api-shared:$dominoVersion:sources")
+
+  compileOnly("com.progressoft.brix.domino.api:domino-api-client:$dominoVersion")
+  compileOnly("com.progressoft.brix.domino.api:domino-api-client:$dominoVersion:sources")
+
+  compileOnly("com.progressoft.brix.domino.impl:domino-gwt:$dominoVersion")
+  compileOnly("com.progressoft.brix.domino.impl:domino-gwt:$dominoVersion:sources")
+
+  compileOnly("com.progressoft.brix.domino.logging:domino-gwt-logger:$dominoVersion")
+  compileOnly("com.progressoft.brix.domino.logging:domino-gwt-logger:$dominoVersion:sources")
+
+
+  compileOnly("com.progressoft.brix.domino:domino-client-commons:$dominoVersion")
+  compileOnly("com.progressoft.brix.domino:domino-client-commons:$dominoVersion:sources")
+
+
+  compileOnly("com.google.elemental2:elemental2-core:1.0.0-RC1")
+  compileOnly("com.google.elemental2:elemental2-dom:1.0.0-RC1")
+
+
+  compileOnly("org.fusesource.restygwt:restygwt:2.2.0")
+  annotationProcessor("com.progressoft.brix.domino.apt:apt-client:$dominoVersion")
+  annotationProcessor("com.google.auto.service:auto-service:1.0-rc3")
+  annotationProcessor "com.google.gwt:gwt-user:$gwtVersion"
+  annotationProcessor("com.progressoft.brix.domino.api:domino-api-shared:$dominoVersion")
+  annotationProcessor("com.progressoft.brix.domino.api:domino-api-client:$dominoVersion")
+  annotationProcessor("com.progressoft.brix.domino.impl:domino-gwt:$dominoVersion")
+  
+
+  compileOnly("com.google.auto.service:auto-service:1.0-rc3")
+
   // GWT framework
   compileOnly("com.google.gwt:gwt-user:$gwtVersion")
   compileOnly("com.google.gwt:gwt-dev:$gwtVersion")
@@ -54,6 +86,26 @@ dependencies {
 clean.doFirst {
   delete "${rootDir}/build"
   delete "${rootDir}/war"
+}
+
+compileGwt{
+  classpath {
+    [
+        sourceSets.main.java.srcDirs,           // Java source
+        sourceSets.main.output.resourcesDir,    // Generated resources
+        sourceSets.main.output.classesDir,      // Generated classes
+        sourceSets.main.compileClasspath,       // Deps
+    ]
+  }
+}
+
+sourceSets {
+  main {
+    java {
+      srcDirs 'build/generated/source/apt/main'
+      srcDirs 'src/main/java/proto/main/java'
+    }
+  }
 }
 
 task wrapper(type: Wrapper) {

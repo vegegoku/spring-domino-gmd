@@ -5,6 +5,12 @@
 
   <!-- Inherit the core Web Toolkit stuff.                  -->
   <inherits name='com.google.gwt.user.User'/>
+  <inherits name="com.progressoft.brix.domino.gwt.Core"/>
+  <inherits name="com.progressoft.brix.domino.api.Domino"/>
+  <inherits name="com.progressoft.brix.domino.logger.Logging"/>
+  <inherits name="org.fusesource.restygwt.RestyGWT"/>
+  <inherits name="elemental2.core.Core"/>
+  <inherits name="elemental2.dom.Dom"/>
 
   <!-- Specify the app entry point class.                   -->
   <entry-point class='com.test.portal.client.Portal'/>
